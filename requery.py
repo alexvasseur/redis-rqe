@@ -41,7 +41,7 @@ def query_redis(threadID, count):
             #total = results.total
             rows = results.rows
             #TODO do something
-            print(f"{registry.timer("query").get_mean()*1000}",end='\r')
+            print(f"{registry.timer('query').get_mean()*1000}",end='\r')
         except redis.exceptions.ResponseError as e:
             print(f"Error querying index: {e}")
 

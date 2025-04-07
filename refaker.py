@@ -49,7 +49,7 @@ def insert_into_redis(threadID, start_index, count, batch_size=100):
             with registry.timer("pipeline").time():
                 pipeline.execute()
             #print(f"{start_index + i + 1} JSON objects inserted so far...", end='\r')
-            print(f"{registry.timer("pipeline").get_mean()*1000/batch_size}",end='\r')
+            print(f"{registry.timer('pipeline').get_mean()*1000/batch_size}",end='\r')
 
     # Execute the remaining objects in the pipeline if any
     if count % batch_size != 0:
