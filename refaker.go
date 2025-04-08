@@ -144,7 +144,5 @@ func main() {
 		}
 
 		wg.Wait()
-		//fmt.Println("All data insertion tasks completed.")
-		//timer.Clear() // Reset for the next round if running in a loop
 	}
 }

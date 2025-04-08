@@ -71,10 +71,8 @@ def main():
     # Start threads to process data insertion concurrently
     while True:
         futures = []
-        with ThreadPoolExecutor(1) as executor:
-            executor.submit(query_redis, 0, num_query//num_threads)
         with ProcessPoolExecutor(max_workers=num_threads) as executor:
-            for t in range(1, num_threads):
+            for t in range(num_threads):
                 futures.append(executor.submit(query_redis, t, num_query//num_threads))
 
         # Wait for all threads to complete
