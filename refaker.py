@@ -1,10 +1,20 @@
 import random
+import argparse
 import pyformance.reporters
 import redis
 from faker import Faker
 from datetime import datetime, timedelta
+from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import ThreadPoolExecutor
+import multiprocessing
 import pyformance
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Read Redis connection arguments")
+    parser.add_argument("-H", default="localhost", type=str, required=False, help="Redis host")
+    parser.add_argument("-p", default=6379, type=int, required=False, help="Redis port")
+    parser.add_argument("-a", default=None, type=str, required=False, help="Redis password")
+    return parser.parse_args()
 
 # Initialize Faker
 fake = Faker()
@@ -46,11 +56,13 @@ def insert_into_redis(threadID, start_index, count, batch_size=100):
         
         # Execute pipeline when batch size is reached
         if (i + 1) % (batch_size) == 0:
-            with registry.timer("pipeline").time():
+            if (threadID==0):
+                with registry.timer("pipeline").time():
+                    pipeline.execute()
+                #print(f"{start_index + i + 1} JSON objects inserted so far...", end='\r')
+                print(f"{registry.timer('pipeline').get_mean()*1000/batch_size}",end='\r')
+            else:
                 pipeline.execute()
-            #print(f"{start_index + i + 1} JSON objects inserted so far...", end='\r')
-            print(f"{registry.timer('pipeline').get_mean()*1000/batch_size}",end='\r')
-
     # Execute the remaining objects in the pipeline if any
     if count % batch_size != 0:
         pipeline.execute()
@@ -58,32 +70,38 @@ def insert_into_redis(threadID, start_index, count, batch_size=100):
 
 # Main function to configure and run the insert process
 def main():
+    multiprocessing.set_start_method("fork")
     total_json = 2_000_000  # Set the total number of JSON objects to be created
     batch_size = 100   # Set the pipeline batch size
     num_threads = 20   # Set the number of concurrent threads
-
-    for t in range(num_threads):
-        r.append(redis.Redis(host='localhost', port=6379, db=0))
-
-    reporter = pyformance.reporters.ConsoleReporter(registry, reporting_interval=5)
-    reporter.start()
-
     # Calculate the number of objects each thread should handle
     count_per_thread = total_json // num_threads
     remainder = total_json % num_threads
 
+    args = parse_args()
+
+    for t in range(num_threads):
+        r.append(redis.Redis(host=args.H, port=args.p, password=args.a, db=0))
+
+    reporter = pyformance.reporters.ConsoleReporter(registry, reporting_interval=5)
+    reporter.start()
+
     # Start threads to process data insertion concurrently
     while True:
-        with ThreadPoolExecutor(max_workers=num_threads) as executor:
-            futures = []
-            for t in range(num_threads):
+        futures = []
+        #with ThreadPoolExecutor(1) as executor:
+        #    start_index = 0
+        #    count = count_per_thread
+        #    executor.submit(insert_into_redis, 0, start_index, count, batch_size)
+        with ProcessPoolExecutor(max_workers=num_threads) as executor:
+            for t in range(0,num_threads):
                 start_index = t * count_per_thread
                 count = count_per_thread + (1 if t < remainder else 0)  # Distribute any remainder
                 futures.append(executor.submit(insert_into_redis, t, start_index, count, batch_size))
 
-            # Wait for all threads to complete
-            for future in futures:
-                future.result()
+        # Wait for all threads to complete
+        for future in futures:
+            future.result()
 
         print("All data insertion tasks completed.")
         registry.clear()
