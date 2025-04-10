@@ -47,6 +47,7 @@ func index(host string, port int, password string) {
 func queryRedis(ctx context.Context, client *redis.Client, threadID int, count int, wg *sync.WaitGroup) {
 	agemin := threadID * 5
 	agemax := agemin + 5
+	defer wg.Done()
 
 	for i := 0; i < count; i++ {
 		start := time.Now()

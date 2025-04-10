@@ -21,3 +21,14 @@ go run refaker.go -h redis-12000.cluster.avasseur-default.demo.redislabs.com -p 
 
 [Metrics] Count: 7593  Mean: 10.98ms  95th: 23.41ms  99th: 59.09ms  Rate: 151860.00/s
 ```
+
+# Running query load
+
+This will query as `FT.SEARCH person_index @country:{France} @age:[45 50] SORTBY age LIMIT 0 10` and display overall stats.
+
+The query is configured to fetch data (not using FT.AGGREGATE, and using `NoContent: false`).
+```
+go run requery/requery.go -h redis-12000.cluster.avasseur-default.demo.redislabs.com -p 12000 -a xxx
+
+[Metrics] Count: 3871  Mean: 25.92ms  95th: 35.75ms  99th: 40.24ms  Rate: 769.60/s
+```
