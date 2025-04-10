@@ -30,7 +30,7 @@ func index(host string, port int, password string) {
 	})
 
 	// Index definition
-	idx_country := &redis.FieldSchema{FieldName: "$.country", FieldType: redis.SearchFieldTypeTag, As: "country"}
+	idx_country := &redis.FieldSchema{FieldName: "$.country", FieldType: redis.SearchFieldTypeTag, As: "country", Sortable: true}
 	idx_age := &redis.FieldSchema{FieldName: "$.age", FieldType: redis.SearchFieldTypeNumeric, As: "age", Sortable: true}
 	idx_firstname := &redis.FieldSchema{FieldName: "$.firstname", FieldType: redis.SearchFieldTypeText, As: "firstname"}
 	_, err := client.FTCreate(ctx, "person_index",

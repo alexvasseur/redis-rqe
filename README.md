@@ -51,6 +51,14 @@ or run both to get a mixed workload
 [Metrics] Count: 4166  Mean: 21.69ms  95th: 30.36ms  99th: 36.41ms  Rate: 83320.00/s
 ```
 
+# Other queries
+
+```
+FT.AGGREGATE 'person_index' 'alex' GROUPBY 1 @country REDUCE COUNT 0 AS cnt SORTBY 2 @cnt DESC
+
+FT.AGGREGATE 'person_index' @country:{France} LOAD 3 country age firstname FILTER '@age >=45 && @age < 50' SORTBY 2 @age ASC MAX 1000 LIMIT 0 10
+```
+
 # TODO
 
 - wait for full index creation and display progress
