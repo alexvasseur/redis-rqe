@@ -10,8 +10,11 @@ go mod download
 
 # Notes
 
-By default each subroutine opens its own connection
+By default each subroutine opens its own connection.
+
 Defaults to 20 subroutine and 2M entries which amounts for 1.22GB of dataset (700 byte on average)
+
+The index is on @country (tag), @age (numeric sortable), @firstname (full text)
 
 # Loading data (insert/update)
 
@@ -19,18 +22,24 @@ This will display overall stats (multiplies by the pipeline size to reflect ops/
 ```
 go run refaker.go -h redis-12000.cluster.avasseur-default.demo.redislabs.com -p 12000 -a xxx
 
-[Metrics] Count: 7593  Mean: 10.98ms  95th: 23.41ms  99th: 59.09ms  Rate: 151860.00/s
+[Metrics] Count: 10718  Mean: 5.95ms  95th: 8.64ms  99th: 9.51ms  Rate: 214360.00/s
+[Metrics] Count: 10678  Mean: 6.14ms  95th: 8.87ms  99th: 9.67ms  Rate: 213560.00/s
 ```
 
 # Running query load
 
+On first run, it will create the index.
+
 This will query as `FT.SEARCH person_index @country:{France} @age:[45 50] SORTBY age LIMIT 0 10` and display overall stats.
 
 The query is configured to fetch data (not using FT.AGGREGATE, and using `NoContent: false`).
+
+
 ```
 go run requery/requery.go -h redis-12000.cluster.avasseur-default.demo.redislabs.com -p 12000 -a xxx
 
-[Metrics] Count: 3871  Mean: 25.92ms  95th: 35.75ms  99th: 40.24ms  Rate: 769.60/s
+[Metrics] Count: 5402  Mean: 18.52ms  95th: 25.86ms  99th: 29.41ms  Rate: 1075.40/s
+[Metrics] Count: 5394  Mean: 18.63ms  95th: 27.08ms  99th: 31.14ms  Rate: 1073.20/s
 ```
 
 or run both to get a mixed workload
@@ -44,6 +53,7 @@ or run both to get a mixed workload
 
 # TODO
 
+- wait for full index creation and display progress
 - rate limit the insert/update
-- provide other query args
-- provide hashtag on country
+- provide optoins for other queries
+- provide options for hashtag on country
