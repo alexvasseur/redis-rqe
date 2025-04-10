@@ -56,6 +56,8 @@ or run both to get a mixed workload
 ```
 FT.AGGREGATE 'person_index' 'alex' GROUPBY 1 @country REDUCE COUNT 0 AS cnt SORTBY 2 @cnt DESC
 
+FT.AGGREGATE person_index * GROUPBY 1 @country REDUCE COUNT 0 AS cnt SORTBY 2 @cnt DESC
+
 FT.AGGREGATE 'person_index' @country:{France} LOAD 3 country age firstname FILTER '@age >=45 && @age < 50' SORTBY 2 @age ASC MAX 1000 LIMIT 0 10
 ```
 
