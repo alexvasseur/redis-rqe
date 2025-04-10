@@ -32,3 +32,18 @@ go run requery/requery.go -h redis-12000.cluster.avasseur-default.demo.redislabs
 
 [Metrics] Count: 3871  Mean: 25.92ms  95th: 35.75ms  99th: 40.24ms  Rate: 769.60/s
 ```
+
+or run both to get a mixed workload
+```
+[Metrics] Count: 3714  Mean: 24.65ms  95th: 39.69ms  99th: 79.22ms  Rate: 74280.00/s
+[Metrics] Count: 214  Mean: 413.34ms  95th: 1086.29ms  99th: 1175.54ms  Rate: 42.80/s
+[Metrics] Count: 3685  Mean: 25.35ms  95th: 38.60ms  99th: 73.32ms  Rate: 73700.00/s
+[Metrics] Count: 335  Mean: 333.38ms  95th: 1113.37ms  99th: 1258.99ms  Rate: 66.80/s
+[Metrics] Count: 4166  Mean: 21.69ms  95th: 30.36ms  99th: 36.41ms  Rate: 83320.00/s
+```
+
+# TODO
+
+- rate limit the insert/update
+- provide other query args
+- provide hashtag on country
