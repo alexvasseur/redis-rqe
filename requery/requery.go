@@ -87,7 +87,7 @@ func reportMetrics(interval time.Duration, done <-chan struct{}) {
 			return
 		case <-ticker.C:
 			snapshot := timer.Snapshot()
-			fmt.Printf("[Metrics] Count: %d  Mean: %.2fms  95th: %.2fms  99th: %.2fms  Rate: %.2f/s\n",
+			fmt.Printf("[Query] Count: %d  Mean: %.2fms  95th: %.2fms  99th: %.2fms  Rate: %.2f/s\n",
 				snapshot.Count(),
 				float64(snapshot.Mean())/1e6,
 				float64(snapshot.Percentile(0.95))/1e6,
