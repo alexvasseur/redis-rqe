@@ -39,8 +39,22 @@ func index(host string, port int, password string) {
 		fmt.Println("Error creating index:", err)
 		return
 	}
-
 	fmt.Println("Index created successfully.")
+
+	// Wait for indexing completion
+	for {
+		res, _ := client.Do(ctx, "FT.INFO", "person_index").Result()
+		infoArray, _ := res.(interface{})
+		dataArray, _ := infoArray.(map[interface{}]interface{})
+		var percentIndexed float64
+		percentIndexed, _ = dataArray["percent_indexed"].(float64)
+		fmt.Printf("Indexing: %.0f%%\n", percentIndexed*100)
+		if percentIndexed >= 1.0 {
+			fmt.Println("Indexing complete!")
+			break
+		}
+		time.Sleep(3 * time.Second)
+	}
 }
 
 // Function to perform RedisSearch queries
